@@ -1,0 +1,28 @@
+Install Version 1.18.5 of kubeadm on Master Node
+#1- Unhold the version of kubeadm
+sudo apt-mark unhold kubeadm
+#2- install new version of kubeadm
+sudo apt install -y kubeadm=1.18.5-00
+## use kubeadm to update other components
+
+Upgrade Control Plane Components using kubeadm
+#1- plan the upgrade
+sudo kubeadm upgrade plan
+#2- Apply the upgrade
+sudo kubeadm upgrade apply v1.18.5
+
+Install Version 1.18.5 of kubelet and kubectl on master node
+#1- Unhold the version of kubelet and  kubectl
+sudo apt-mark unhold kubelet kubectl
+#2- install new version of kubelet and kubect
+sudo apt install -y kubelet=1.18.5-00
+sudo apt install -y kubectl=1.18.5-00
+
+Install Version 1.18.5 of kubelet on The Worker Nodes
+#1- Unhold the version of kubelet
+sudo apt-mark unhold kubelet
+#2- install new version of kubelet
+sudo apt install -y kubelet=1.18.5-00
+
+Check nodes version 
+kubectl get nodes
