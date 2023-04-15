@@ -1,0 +1,104 @@
+jenkins:
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: admin
+          password: admin
+  authorizationStrategy:
+    matrix:
+      grantedPermissions:
+        - permission:
+            - 'com.cloudbees.plugins.credentials.CredentialsProvider.Create:admin'
+            - 'com.cloudbees.plugins.credentials.CredentialsProvider.Delete:admin'
+            - 'com.cloudbees.plugins.credentials.CredentialsProvider.ManageDomains:admin'
+            - 'com.cloudbees.plugins.credentials.CredentialsProvider.Update:admin'
+            - 'com.cloudbees.plugins.credentials.CredentialsProvider.View:admin'
+            - 'hudson.model.Item.Build:admin'
+            - 'hudson.model.Item.Cancel:admin'
+            - 'hudson.model.Run.Delete:admin'
+            - 'hudson.model.Run.Replay:admin'
+            - 'hudson.scm.SCM.Tag:admin'
+            - 'hudson.model.Run.Update:admin'
+            - 'hudson.model.Item.Configure:admin'
+            - 'hudson.model.Item.Delete:admin'
+            - 'hudson.model.Item.Discover:admin'
+            - 'hudson.model.Item.Move:admin'
+            - 'hudson.model.Item.Read:admin'
+            - 'hudson.model.Item.Workspace:admin'
+            - 'hudson.model.Item.Read:m.ilkhani'
+            - 'hudson.model.Item.Cancel:m.ilkhani'
+            - 'hudson.model.Item.Workspace:m.ilkhani'
+            - 'hudson.model.Run.Delete:m.ilkhani'
+            - 'hudson.model.Run.Replay:m.ilkhani'
+            - 'hudson.model.Item.Build:m.ilkhani'
+            - 'hudson.model.Run.Update:m.ilkhani'
+            - 'hudson.scm.SCM.Tag:m.ilkhani'
+  jobs:
+  - script: >
+      pipeline {
+        agent none
+        options {
+          buildDiscarder(logRotator(
+            artifactDaysToKeepStr: '',
+            artifactNumToKeepStr: '',
+            daysToKeepStr: '',
+            numToKeepStr: '10'
+          ))
+          disableConcurrentBuilds(abortPrevious: true)
+        }
+        gitLabConnection(gitLabConnection: '', jobCredentialId: '')
+      }
+  jobs:
+  - script: >
+      pipeline {
+        environment {
+          BUILD = true
+          DEPLOY = false
+          PROJECT_NAME = "admin-panel"
+          PROJECT_GROUP = "oms"
+          PROJECT_TAG = "\${params.Branches}"
+        }
+        parameters {
+          gitParameter(
+            branch: '',
+            branchFilter: 'origin.*/(.*)',
+            defaultValue: 'develop',
+            description: 'Load Branches',
+            listSize: '10',
+            name: 'Branches',
+            quickFilterEnabled: false,
+            requiredParameter: false,
+            selectedValue: 'NONE',
+            sortMode: 'ASCENDING_SMART',
+            tagFilter: '*',
+            type: 'PT_BRANCH_TAG',
+            useRepository: '.*admin-panel.git'
+          )
+          booleanParam(
+            name: 'BUILD',
+            defaultValue: false,
+            description: 'Build Admin Panel'
+          )
+          choice(
+            name: 'DEPLOY_AGENT',
+            choices: ['D-Development','D-Staging','D-Production'],
+            description: 'Pick Deploy Agent'
+          )
+          choice(
+            name: 'Deployment_Environment',
+            choices: ['Development','Staging','Production'],
+            description: 'Select Environment'
+          )
+          booleanParam(
+            name: 'DEPLOY',
+            defaultValue: false,
+            description: 'Deploy Admin Panel'
+          )
+          booleanParam(
+            name: 'RESTART',
+            defaultValue: false,
+            description: 'Restart Service Admin Panel'
+          )
+        }
+      }
